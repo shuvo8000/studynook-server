@@ -11,16 +11,34 @@ const bookingRoutes = require("./routes/bookingRoutes");
 
 const app = express();
 
+// Allowed exact origins list
+const allowedOrigins = [
+  "https://studynook-client-uiuh.vercel.app",
+  "https://studynook-client-uiuh-git-main-shuvobiswas800-2475s-projects.vercel.app",
+  "https://studynook-client-uiuh-7aos083as-shuvobiswas800-2475s-projects.vercel.app",
+  "http://localhost:5173",
+  "http://localhost:3000"
+];
+
 app.use(
   cors({
-    origin: ["https://studynook-client-uiuh.vercel.app"],
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like Postman or mobile apps)
+      if (!origin) return callback(null, true);
+      
+      // Allow exact match or any Vercel deployment preview URL ending with vercel.app
+      if (allowedOrigins.indexOf(origin) !== -1 || origin.endsWith(".vercel.app")) {
+        return callback(null, true);
+      } else {
+        return callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
-app.options("*", cors());
 app.use(express.json());
 app.use(cookieParser());
 
